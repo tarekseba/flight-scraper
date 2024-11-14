@@ -11,6 +11,7 @@ import (
 	"github.com/chromedp/cdproto/dom"
 	"github.com/chromedp/chromedp"
 	"github.com/tarekseba/flight-scraper/internal/logger"
+	"github.com/tarekseba/flight-scraper/internal/scraper/scenarios"
 )
 const DAY = time.Hour * 24
 
@@ -50,13 +51,12 @@ func main() {
 
 	ctx, cancel = context.WithTimeout(ctx, 50*time.Second)
 	defer cancel()
+
 	logger.InfoLogger.Println("Starting the application")
 	logger.InfoLogger.Println("GET " + G_FLIGHTS_URL)
 	err = chromedp.Run(ctx,
-		chromedp.Navigate(G_FLIGHTS_URL),
-		chromedp.Sleep(2*time.Second),
-		chromedp.WaitVisible(ACCEPT_COOKIES_BTN, chromedp.ByQuery),
-		chromedp.Click(ACCEPT_COOKIES_BTN, chromedp.ByQuery),
+		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewNavigateToPage(G_FLIGHTS_URL))),
+		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewAcceptGFlightCookies())),
 	)
 	if err != nil {
 		logger.ErrorLogger.Println("Error while performing the automation logic:", err)
