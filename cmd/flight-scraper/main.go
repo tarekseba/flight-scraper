@@ -12,6 +12,7 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/tarekseba/flight-scraper/internal/logger"
 	"github.com/tarekseba/flight-scraper/internal/scraper/scenarios"
+	"github.com/tarekseba/flight-scraper/internal/scraper/types"
 )
 const DAY = time.Hour * 24
 
@@ -63,3 +64,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = chromedp.Run(ctx,
+		chromedp.WaitVisible("body", chromedp.ByQuery),
+		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewFillAndConfirmTripInfos(request))),
+	)
