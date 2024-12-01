@@ -154,3 +154,55 @@ type Scenario interface {
 	Name() string
 	Do(ctx context.Context) error
 }
+
+type RoundTripFlight struct {
+	OutboundDepTime  time.Time
+	OutboundArrTime  time.Time
+	OutboundDepDate  string
+	OutboundAirports string
+	OutboundCompany  string
+	OutboundDuration string
+	OutboundStops    uint
+	InboundDepTime   time.Time
+	InboundArrTime   time.Time
+	InboundDepDate   string
+	InboundAirports  string
+	InboundCompany   string
+	InboundDuration  string
+	InboundStops     uint
+	Price            int
+	Currency         string
+}
+
+func RoundTripFlightFromFlights(outbound, inbound Flight) RoundTripFlight {
+	return RoundTripFlight{
+		OutboundDepTime:  outbound.DepTime,
+		OutboundArrTime:  outbound.ArrTime,
+		OutboundDepDate:  outbound.DepDate,
+		OutboundAirports: outbound.Airports,
+		OutboundCompany:  outbound.Currency,
+		OutboundDuration: "",
+		OutboundStops:    0,
+		InboundDepTime:   inbound.DepTime,
+		InboundArrTime:   inbound.ArrTime,
+		InboundDepDate:   inbound.DepDate,
+		InboundAirports:  inbound.Airports,
+		InboundCompany:   inbound.Currency,
+		InboundDuration:  "",
+		InboundStops:     0,
+		Price:            inbound.Price,
+		Currency:         inbound.Currency,
+	}
+}
+
+type Flight struct {
+	DepDate  string    `json:"dep_date"`
+	DepTime  time.Time `json:"dep_time"`
+	ArrTime  time.Time `json:"arr_time"`
+	Airports string    `json:"airports"`
+	Company  string    `json:"company"`
+	Duration string    `json:"duration"`
+	Price    int       `json:"price"`
+	Currency string    `json:"currency"`
+	Stops    uint      `json:"stops"`
+}
