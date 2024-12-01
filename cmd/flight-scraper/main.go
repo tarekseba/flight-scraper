@@ -4,36 +4,14 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/chromedp/cdproto/cdp"
-	"github.com/chromedp/cdproto/dom"
 	"github.com/chromedp/chromedp"
 	"github.com/tarekseba/flight-scraper/internal/logger"
 	"github.com/tarekseba/flight-scraper/internal/scraper/scenarios"
 	"github.com/tarekseba/flight-scraper/internal/scraper/types"
 )
-const DAY = time.Hour * 24
 
-const (
-	G_FLIGHTS_URL        = "https://www.google.com/travel/flights"
-	ACCEPT_COOKIES_BTN   = "button[aria-label='Accept all']"
-	WHERE_FROM_INPUT     = "div[data-placeholder='Where from?'] input"
-	WHERE_TO_INPUT       = "div[data-placeholder='Where to?'] input"
-	D_DATE_INPUT         = "div[data-enable-prices] input[placeholder='Departure']"
-	R_DATE_INPUT         = "div[data-enable-prices] input[placeholder='Return']"
-	CONFIRM_DATE_BTN     = "button[aria-label='Done. Search for round trip flights, departing on December 3, 2024 and returning on December 7, 2024']"
-	D_CITY               = "Paris"
-	D_CITY_LABEL         = "Paris"
-	A_CITY               = "Rome"
-	A_CITY_LABEL         = "Rome, Italy"
-	SEARCH_BUTTON_SCRIPT = `var btn = document.querySelector("button[aria-label='Search']");
-			if (btn == null) {
-				btn = document.querySelector("button[aria-label='Search for flights']")
-			}
-			btn.click();`
-)
 
 func main() {
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
@@ -54,9 +32,9 @@ func main() {
 	defer cancel()
 
 	logger.InfoLogger.Println("Starting the application")
-	logger.InfoLogger.Println("GET " + G_FLIGHTS_URL)
+	logger.InfoLogger.Println("GET " + types.G_FLIGHTS_URL)
 	err = chromedp.Run(ctx,
-		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewNavigateToPage(G_FLIGHTS_URL))),
+		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewNavigateToPage(types.G_FLIGHTS_URL))),
 		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewAcceptGFlightCookies())),
 	)
 	if err != nil {
@@ -64,7 +42,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	var dTime = time.Now().Add(time.Hour * 24)
+	var rTime = time.Now().Add(time.Hour * 24 * 4)
+	var request types.Request = types.Request{
+		Departure:     "Paris",
+		Destination:   "Rome",
+		DepartureDate: dTime,
+		ReturnDate:    rTime,
+	}
 	err = chromedp.Run(ctx,
 		chromedp.WaitVisible("body", chromedp.ByQuery),
+
 		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewFillAndConfirmTripInfos(request))),
 	)
+
