@@ -56,3 +56,18 @@ func main() {
 		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewFillAndConfirmTripInfos(request))),
 	)
 
+	fetchListOfFlights := scenarios.NewFetchListOfFlights(types.SEL_OUTBOUND_FLIGHTS_UL)
+	err = chromedp.Run(ctx,
+		chromedp.ActionFunc(scenarios.LogScenario(&fetchListOfFlights)),
+	)
+
+	ulNodeID := fetchListOfFlights.NodeID
+
+	parseFlightCombos := scenarios.NewParseFlightCombos(ulNodeID, request.DepartureDate, request.ReturnDate)
+
+	err = chromedp.Run(ctx, chromedp.ActionFunc(scenarios.LogScenario(&parseFlightCombos)))
+	if err != nil {
+		logger.ErrorLogger.Println(err.Error())
+		os.Exit(1)
+	}
+}
