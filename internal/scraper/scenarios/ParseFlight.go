@@ -12,7 +12,6 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/dom"
 	"github.com/chromedp/cdproto/runtime"
-	"github.com/tarekseba/flight-scraper/internal/logger"
 	"github.com/tarekseba/flight-scraper/internal/scraper/types"
 	"github.com/tarekseba/flight-scraper/internal/scraper/utils"
 )
@@ -110,7 +109,6 @@ func getTime(ctx context.Context, nodeID cdp.NodeID, selector string) (time.Time
 func parseTime(value string) (time.Time, error) {
 	if value != "" {
 		timeTextSplit := strings.Split(value, " ")
-		logger.InfoLogger.Println(timeTextSplit)
 		timeText := timeTextSplit[2]
 		timeText = strings.ReplaceAll(timeText, "\xe2\x80\xaf", " ")
 		timeText = strings.ReplaceAll(timeText, ".", "")

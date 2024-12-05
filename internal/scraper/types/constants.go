@@ -3,6 +3,7 @@ package types
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/tarekseba/flight-scraper/internal/scraper/utils"
 )
@@ -59,4 +60,8 @@ const (
 
 const (
 	INNER_TEXT_FUNC = "function() {return this.innerText}"
+)
+
+const (
+	DAY = time.Hour * 24
 )
