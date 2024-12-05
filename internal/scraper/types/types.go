@@ -121,7 +121,36 @@ func (q *Query) IntoRequests() []Request {
 	var requests = make([]Request, 0)
 	var currentMonth = time.Now().Month()
 	var maxMonth = MaxMonth(currentMonth, q.MonthHorizon)
-	fmt.Println(maxMonth)
+	if len(q.Weekdays) <= 0 {
+		return requests
+	}
+	currentDate := time.Now().Add(DAY)
+	currentWeekday := Weekday(currentDate.Weekday())
+	daysArray := make([]Weekday, len(q.Weekdays))
+	i := 0
+	for d, _ := range q.Weekdays {
+		daysArray[i] = d
+		i++
+	}
+	slices.Sort(daysArray)
+
+	for currentMonth != maxMonth {
+		for d := range daysArray {
+			key := daysArray[d]
+			diff := key.Difference(&currentWeekday)
+			currentDate = currentDate.Add(DAY * time.Duration(diff))
+			currentMonth = currentDate.Month()
+			if currentMonth == maxMonth {
+				break
+			}
+			currentWeekday = Weekday(currentDate.Weekday())
+			request := Request{Departure: q.Departure, Destination: q.Destination}
+			request.DepartureDate = currentDate
+			returnDate := currentDate.Add(DAY * time.Duration(q.StayDuration))
+			request.ReturnDate = returnDate
+			requests = append(requests, request)
+		}
+	}
 	return requests
 }
 
