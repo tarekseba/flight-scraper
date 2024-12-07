@@ -65,3 +65,12 @@ const (
 const (
 	DAY = time.Hour * 24
 )
+
+const (
+	SELECTOR_AIRPORT         = "div > div > div > div > div > div > span span[aria-label='']:not(:has(> span))"
+	SELECTOR_STOPS           = "div > div > div span[aria-label*='stop']"
+	SELECTOR_PRICE           = "div > div > div > div > div:not([role]) > div > div > div > span[aria-label]"
+	SELECTOR_FLIGHT_DURATION = "div > div > div div[aria-label^='Total duration']"
+	SELECTOR_AIRLINE         = "div > div > div > div > div > div > span:not([aria-label])"
+	SELECTOR_FLIGHT_TIME     = "div > div > div span[aria-label^='%s'] > span"
+)

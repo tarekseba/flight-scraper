@@ -83,7 +83,7 @@ func (s *ParseFlight) Do(ctx context.Context) error {
 
 func getTime(ctx context.Context, nodeID cdp.NodeID, selector string) (time.Time, error) {
 	t := time.Now()
-	spanId, err := dom.QuerySelector(nodeID, fmt.Sprintf("div > div > div span[aria-label^='%s'] > span", selector)).Do(ctx)
+	spanId, err := dom.QuerySelector(nodeID, fmt.Sprintf(types.SELECTOR_FLIGHT_TIME, selector)).Do(ctx)
 	if err != nil {
 		return t, utils.AnnotateError(err)
 	}
@@ -129,7 +129,7 @@ func parseTime(value string) (time.Time, error) {
 
 func getAirlineCompany(ctx context.Context, nodeID cdp.NodeID) (string, error) {
 	var airline = ""
-	node, err := dom.QuerySelector(nodeID, "div > div > div > div > div > div > span:not([aria-label])").Do(ctx)
+	node, err := dom.QuerySelector(nodeID, types.SELECTOR_AIRLINE).Do(ctx)
 	if err != nil {
 		return airline, utils.AnnotateError(err)
 	}
@@ -147,7 +147,7 @@ func getAirlineCompany(ctx context.Context, nodeID cdp.NodeID) (string, error) {
 }
 
 func getFlightDuration(ctx context.Context, nodeID cdp.NodeID) (string, error) {
-	div, err := dom.QuerySelector(nodeID, "div > div > div div[aria-label^='Total duration']").Do(ctx)
+	div, err := dom.QuerySelector(nodeID, types.SELECTOR_FLIGHT_DURATION).Do(ctx)
 	if err != nil {
 		return "", utils.AnnotateError(err)
 	}
@@ -167,7 +167,7 @@ func getFlightDuration(ctx context.Context, nodeID cdp.NodeID) (string, error) {
 }
 
 func getAirports(ctx context.Context, nodeID cdp.NodeID) (string, string, error) {
-	elements, err := dom.QuerySelectorAll(nodeID, "div > div > div > div > div > div > span span[aria-label='']").Do(ctx)
+	elements, err := dom.QuerySelectorAll(nodeID, types.SELECTOR_AIRPORT).Do(ctx)
 	if err != nil {
 		return "", "", utils.AnnotateError(err)
 	}
@@ -192,7 +192,7 @@ func getAirports(ctx context.Context, nodeID cdp.NodeID) (string, string, error)
 }
 
 func getStops(ctx context.Context, nodeID cdp.NodeID) (uint, error) {
-	node, err := dom.QuerySelector(nodeID, "div > div > div span[aria-label*='stop']").Do(ctx)
+	node, err := dom.QuerySelector(nodeID, types.SELECTOR_STOPS).Do(ctx)
 	if err != nil {
 		return 0, utils.AnnotateError(err)
 	}
@@ -225,7 +225,7 @@ func getStops(ctx context.Context, nodeID cdp.NodeID) (uint, error) {
 }
 
 func getPrice(ctx context.Context, nodeID cdp.NodeID) (int, string, error) {
-	price_node, err := dom.QuerySelector(nodeID, "div > div > div > div > div:not([role]) > div > div > div > span[aria-label]").Do(ctx)
+	price_node, err := dom.QuerySelector(nodeID, types.SELECTOR_PRICE).Do(ctx)
 	if err != nil {
 		return -1, "", utils.AnnotateError(err)
 	}
