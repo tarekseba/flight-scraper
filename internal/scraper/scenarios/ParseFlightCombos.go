@@ -43,7 +43,7 @@ func (s *ParseFlightCombos) Do(ctx context.Context) error {
 			return nil
 		}
 		var flight = types.Flight{
-			DepDate: s.DepDate.Format(types.DATE_FORMAT),
+			DepDate: s.DepDate,
 		}
 		var parseFlight = ParseFlight{NodeID: ulChildren[i], Flight: &flight, WithPrice: true}
 		err = parseFlight.Do(ctx)

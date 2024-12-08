@@ -136,6 +136,7 @@ func (q *Query) IntoRequests() []Request {
 
 	for currentMonth != maxMonth {
 		for d := range daysArray {
+			request := Request{Departure: q.Departure, Destination: q.Destination}
 			key := daysArray[d]
 			diff := key.Difference(&currentWeekday)
 			currentDate = currentDate.Add(DAY * time.Duration(diff))
@@ -144,7 +145,6 @@ func (q *Query) IntoRequests() []Request {
 				break
 			}
 			currentWeekday = Weekday(currentDate.Weekday())
-			request := Request{Departure: q.Departure, Destination: q.Destination}
 			request.DepartureDate = currentDate
 			returnDate := currentDate.Add(DAY * time.Duration(q.StayDuration))
 			request.ReturnDate = returnDate
@@ -192,14 +192,14 @@ type Scenario interface {
 type RoundTripFlight struct {
 	OutboundDepTime  time.Time
 	OutboundArrTime  time.Time
-	OutboundDepDate  string
+	OutboundDepDate  time.Time
 	OutboundAirports string
 	OutboundCompany  string
 	OutboundDuration string
 	OutboundStops    uint
 	InboundDepTime   time.Time
 	InboundArrTime   time.Time
-	InboundDepDate   string
+	InboundDepDate   time.Time
 	InboundAirports  string
 	InboundCompany   string
 	InboundDuration  string
@@ -230,7 +230,7 @@ func RoundTripFlightFromFlights(outbound, inbound Flight) RoundTripFlight {
 }
 
 type Flight struct {
-	DepDate  string    `json:"dep_date"`
+	DepDate  time.Time `json:"dep_date"`
 	DepTime  time.Time `json:"dep_time"`
 	ArrTime  time.Time `json:"arr_time"`
 	Airports string    `json:"airports"`
@@ -239,4 +239,16 @@ type Flight struct {
 	Price    int       `json:"price"`
 	Currency string    `json:"currency"`
 	Stops    uint      `json:"stops"`
+}
+
+func (f *Flight) ID() string {
+	date := f.DepDate.Format(DATE_FORMAT)
+	time := strings.ReplaceAll(f.DepTime.Format(TIME_FORMAT_FULL), " ", "")
+	comp := f.Company
+	comp = strings.ReplaceAll(comp, " ", "")
+	if len(comp) > 4 {
+		comp = comp[:4]
+	}
+	airports := strings.ReplaceAll(f.Airports, " ", "")
+	return fmt.Sprintf("%s.%s.%s", date, time, airports)
 }

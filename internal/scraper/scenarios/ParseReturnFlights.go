@@ -41,7 +41,7 @@ func (s *ParseReturnFlights) Do(ctx context.Context) error {
 
 	for idx := range liNodes {
 		var return_flight = types.Flight{
-			DepDate: s.returnDate.Format(types.DATE_FORMAT),
+			DepDate: s.returnDate,
 		}
 		var parseFlight = ParseFlight{NodeID: liNodes[idx], Flight: &return_flight, WithPrice: true}
 		err = parseFlight.Do(ctx)
