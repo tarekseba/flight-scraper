@@ -19,18 +19,18 @@ func (s *FillAndConfirmTripInfos) Name() string {
 
 func (s *FillAndConfirmTripInfos) Do(ctx context.Context) error {
 	// Fill 'FROM' input
-	err := fillFromInput(ctx, s.Departure, types.WHERE_FROM_INPUT, types.D_CITY_LABEL)
+	err := fill_from_input(ctx, s.Departure, types.SELECTOR_WHERE_FROM_INPUT, types.SELECTOR_D_CITY_LABEL)
 	if err != nil {
 		return err
 	}
 
 	// Fill 'TO' input
-	err = fillToInput(ctx, s.Destination, types.WHERE_TO_INPUT, types.A_CITY_LABEL)
+	err = fill_to_input(ctx, s.Destination, types.SELECTOR_WHERE_TO_INPUT, types.SELECTOR_A_CITY_LABEL)
 	if err != nil {
 		return err
 	}
 
-	err = fillDateInputsAndSearch(ctx, s.DepartureDate, s.ReturnDate)
+	err = fill_date_inputs_and_search(ctx, s.DepartureDate, s.ReturnDate)
 	if err != nil {
 		return err
 	}
@@ -41,12 +41,12 @@ func NewFillAndConfirmTripInfos(request types.Request) *FillAndConfirmTripInfos 
 	return &FillAndConfirmTripInfos{Request: request}
 }
 
-func fillFromInput(ctx context.Context, city string, selector string, optionSelector string) error {
+func fill_from_input(ctx context.Context, city string, selector string, optionSelector string) error {
 	err := chromedp.WaitVisible(selector, chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
-	err = chromedp.Evaluate(generateTriggerInputFieldScript(selector, city), nil).Do(ctx)
+	err = chromedp.Evaluate(generate_trigger_input_field_script(selector, city), nil).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -54,34 +54,34 @@ func fillFromInput(ctx context.Context, city string, selector string, optionSele
 	if err != nil {
 		return err
 	}
-	err = chromedp.WaitVisible(makeOptionSelector(optionSelector), chromedp.ByQuery).Do(ctx)
+	err = chromedp.WaitVisible(make_option_selector(optionSelector), chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
-	chromedp.Click(makeOptionSelector(optionSelector), chromedp.ByQuery)
+	chromedp.Click(make_option_selector(optionSelector), chromedp.ByQuery)
 	return nil
 }
 
-func fillToInput(ctx context.Context, city string, selector string, optionSelector string) error {
-	err := chromedp.Evaluate(generateTriggerInputFieldScript(types.WHERE_TO_INPUT, types.A_CITY), nil).Do(ctx)
+func fill_to_input(ctx context.Context, city string, selector string, optionSelector string) error {
+	err := chromedp.Evaluate(generate_trigger_input_field_script(types.SELECTOR_WHERE_TO_INPUT, types.SELECTOR_A_CITY), nil).Do(ctx)
 	if err != nil {
 		return err
 	}
-	err = chromedp.WaitVisible(makeOptionSelector(types.A_CITY_LABEL), chromedp.ByQuery).Do(ctx)
+	err = chromedp.WaitVisible(make_option_selector(types.SELECTOR_A_CITY_LABEL), chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
-	err = chromedp.Click(makeOptionSelector(types.A_CITY_LABEL), chromedp.ByQuery).Do(ctx)
+	err = chromedp.Click(make_option_selector(types.SELECTOR_A_CITY_LABEL), chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func fillDateInputsAndSearch(ctx context.Context, departure time.Time, returnD time.Time) error {
-	var departureDate = formatDate(departure)
-	var returnDate = formatDate(returnD)
-	err := chromedp.Click(types.D_DATE_INPUT, chromedp.ByQuery).Do(ctx)
+func fill_date_inputs_and_search(ctx context.Context, departure time.Time, returnD time.Time) error {
+	var departureDate = format_date(departure)
+	var returnDate = format_date(returnD)
+	err := chromedp.Click(types.SELECTOR_D_DATE_INPUT, chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -89,11 +89,11 @@ func fillDateInputsAndSearch(ctx context.Context, departure time.Time, returnD t
 	if err != nil {
 		return err
 	}
-	err = chromedp.WaitVisible(generateCalendarDateSelector(departureDate), chromedp.ByQuery).Do(ctx)
+	err = chromedp.WaitVisible(generate_calendar_date_selector(departureDate), chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
-	err = chromedp.Click(generateCalendarDateSelector(departureDate), chromedp.ByQuery).Do(ctx)
+	err = chromedp.Click(generate_calendar_date_selector(departureDate), chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func fillDateInputsAndSearch(ctx context.Context, departure time.Time, returnD t
 	if err != nil {
 		return err
 	}
-	err = chromedp.Click(generateCalendarDateSelector(returnDate), chromedp.ByQuery).Do(ctx)
+	err = chromedp.Click(generate_calendar_date_selector(returnDate), chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func fillDateInputsAndSearch(ctx context.Context, departure time.Time, returnD t
 	if err != nil {
 		return err
 	}
-	err = chromedp.Evaluate(types.SEARCH_BUTTON_SCRIPT, nil).Do(ctx)
+	err = chromedp.Evaluate(types.SELECTOR_SEARCH_BUTTON_SCRIPT, nil).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func fillDateInputsAndSearch(ctx context.Context, departure time.Time, returnD t
 	if err != nil {
 		return err
 	}
-	err = chromedp.Evaluate(types.SEARCH_BUTTON_SCRIPT, nil).Do(ctx)
+	err = chromedp.Evaluate(types.SELECTOR_SEARCH_BUTTON_SCRIPT, nil).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -129,11 +129,11 @@ func fillDateInputsAndSearch(ctx context.Context, departure time.Time, returnD t
 	return nil
 }
 
-func makeOptionSelector(city string) string {
+func make_option_selector(city string) string {
 	return fmt.Sprintf(" ul > li[aria-label='%s']", city)
 }
 
-func generateTriggerInputFieldScript(selector string, text string) string {
+func generate_trigger_input_field_script(selector string, text string) string {
 	var format = "var input = document.querySelector(\"%s\");\n" +
 		"input.value = '%s';\n" +
 		"input.dispatchEvent(new Event('input', { bubbles: true }));"
@@ -141,10 +141,10 @@ func generateTriggerInputFieldScript(selector string, text string) string {
 	return fmt.Sprintf(format, selector, text)
 }
 
-func generateCalendarDateSelector(isoDate string) string {
+func generate_calendar_date_selector(isoDate string) string {
 	return fmt.Sprintf("div[data-iso='%s']", isoDate)
 }
 
-func formatDate(t time.Time) string {
+func format_date(t time.Time) string {
 	return t.Format("2006-01-02")
 }

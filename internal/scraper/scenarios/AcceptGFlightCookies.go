@@ -16,11 +16,11 @@ func (s *AcceptGFlightCookies) Name() string {
 }
 
 func (s *AcceptGFlightCookies) Do(ctx context.Context) error {
-	err := chromedp.WaitVisible(types.ACCEPT_COOKIES_BTN, chromedp.ByQuery).Do(ctx)
+	err := chromedp.WaitVisible(types.SELECTOR_ACCEPT_COOKIES_BTN, chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}
-	err = chromedp.Click(types.ACCEPT_COOKIES_BTN, chromedp.ByQuery).Do(ctx)
+	err = chromedp.Click(types.SELECTOR_ACCEPT_COOKIES_BTN, chromedp.ByQuery).Do(ctx)
 	if err != nil {
 		return err
 	}

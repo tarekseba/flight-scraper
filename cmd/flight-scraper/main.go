@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -33,7 +32,7 @@ func main() {
 
 	logger.InfoLogger.Println("Starting the application")
 	logger.InfoLogger.Println("GET " + types.G_FLIGHTS_URL)
-	err = chromedp.Run(ctx,
+	err := chromedp.Run(ctx,
 		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewNavigateToPage(types.G_FLIGHTS_URL))),
 		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewAcceptGFlightCookies())),
 	)
@@ -52,12 +51,11 @@ func main() {
 	}
 	err = chromedp.Run(ctx,
 		chromedp.WaitVisible("body", chromedp.ByQuery),
-
-		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewFillAndConfirmTripInfos(request))),
 	)
 
 	fetchListOfFlights := scenarios.NewFetchListOfFlights(types.SEL_OUTBOUND_FLIGHTS_UL)
 	err = chromedp.Run(ctx,
+		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewFillAndConfirmTripInfos(request))),
 		chromedp.ActionFunc(scenarios.LogScenario(&fetchListOfFlights)),
 	)
 

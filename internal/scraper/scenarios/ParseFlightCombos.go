@@ -46,18 +46,18 @@ func (s *ParseFlightCombos) Do(ctx context.Context) error {
 			DepDate: s.DepDate,
 		}
 		var parseFlight = ParseFlight{NodeID: ulChildren[i], Flight: &flight, WithPrice: true}
-		err = parseFlight.Do(ctx)
+		err = LogScenario(&parseFlight)(ctx)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%+v\n", flight)
+		// fmt.Printf("%+v\n", flight)
 		arr := insert_key_into_map(inbound_outbound_flights_map, flight)
 		var parseReturnFlights = ParseReturnFlights{
 			LiNodeID:   ulChildren[i],
 			returnDate: s.RetDate,
 			flights:    arr,
 		}
-		err := parseReturnFlights.Do(ctx)
+		err := LogScenario(&parseReturnFlights)(ctx)
 		if err != nil {
 			return err
 		}

@@ -2,7 +2,6 @@ package scenarios
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/chromedp/cdproto/cdp"
@@ -48,11 +47,11 @@ func (s *ParseReturnFlights) Do(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%+v\n", return_flight)
+		// fmt.Printf("%+v\n", return_flight)
 		s.flights = append(s.flights, return_flight)
 	}
 	go_back := NewGoBack(1)
-	err = go_back.Do(ctx)
+	err = LogScenario(&go_back)(ctx)
 	if err != nil {
 		return utils.AnnotateError(err)
 	}
