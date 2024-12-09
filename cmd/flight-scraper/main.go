@@ -35,35 +35,24 @@ func main() {
 	err := chromedp.Run(ctx,
 		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewNavigateToPage(types.G_FLIGHTS_URL))),
 		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewAcceptGFlightCookies())),
+		chromedp.WaitVisible("body", chromedp.ByQuery),
 	)
 	if err != nil {
 		logger.ErrorLogger.Println("Error while performing the automation logic:", err)
 		os.Exit(1)
 	}
 
-	var dTime = time.Now().Add(time.Hour * 24)
-	var rTime = time.Now().Add(time.Hour * 24 * 4)
-	var request types.Request = types.Request{
-		Departure:     "Paris",
-		Destination:   "Rome",
-		DepartureDate: dTime,
-		ReturnDate:    rTime,
+	query := types.Query{
+		Weekdays:     map[types.Weekday]bool{types.Weekday(0): true, types.Weekday(2): true},
+		StayDuration: 3,
+		MonthHorizon: 2,
+		Departure:    "Paris",
+		Destination:  "Rome",
 	}
-	err = chromedp.Run(ctx,
-		chromedp.WaitVisible("body", chromedp.ByQuery),
-	)
 
-	fetchListOfFlights := scenarios.NewFetchListOfFlights(types.SEL_OUTBOUND_FLIGHTS_UL)
-	err = chromedp.Run(ctx,
-		chromedp.ActionFunc(scenarios.LogScenario(scenarios.NewFillAndConfirmTripInfos(request))),
-		chromedp.ActionFunc(scenarios.LogScenario(&fetchListOfFlights)),
-	)
+	handleQuery := scenarios.HandleQuery{Query: query}
 
-	ulNodeID := fetchListOfFlights.NodeID
-
-	parseFlightCombos := scenarios.NewParseFlightCombos(ulNodeID, request.DepartureDate, request.ReturnDate)
-
-	err = chromedp.Run(ctx, chromedp.ActionFunc(scenarios.LogScenario(&parseFlightCombos)))
+	err = chromedp.Run(ctx, chromedp.ActionFunc(scenarios.LogScenario(&handleQuery)))
 	if err != nil {
 		logger.ErrorLogger.Println(err.Error())
 		os.Exit(1)

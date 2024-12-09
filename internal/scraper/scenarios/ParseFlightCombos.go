@@ -2,6 +2,7 @@ package scenarios
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -71,6 +72,20 @@ func (s *ParseFlightCombos) Do(ctx context.Context) error {
 			return utils.AnnotateError(err)
 		}
 	}
+	id_dep, id_dep_ret := make_flight_maps(inbound_outbound_flights_map)
+	bytes, err := json.Marshal(id_dep)
+	if err != nil {
+		fmt.Println("Error during marshalling")
+		fmt.Println(err)
+	}
+	fmt.Println(string(bytes))
+
+	bytes, err = json.Marshal(id_dep_ret)
+	if err != nil {
+		fmt.Println("Error during marshalling")
+		fmt.Println(err)
+	}
+	fmt.Println(string(bytes))
 	return nil
 }
 
@@ -82,4 +97,15 @@ func insert_key_into_map(m map[types.Flight][]types.Flight, key types.Flight) []
 	arr := make([]types.Flight, 5)
 	m[key] = arr
 	return arr
+}
+
+func make_flight_maps(m map[types.Flight][]types.Flight) (map[string]types.Flight, map[string][]types.Flight) {
+	id_dep_flight_map := make(map[string]types.Flight)
+	id_ret_flights_map := make(map[string][]types.Flight)
+	for dep_flight, ret_flights := range m {
+		ID := dep_flight.ID()
+		id_dep_flight_map[ID] = dep_flight
+		id_ret_flights_map[ID] = ret_flights
+	}
+	return id_dep_flight_map, id_ret_flights_map
 }

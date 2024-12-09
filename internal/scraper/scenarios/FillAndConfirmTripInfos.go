@@ -7,6 +7,7 @@ import (
 
 	"github.com/chromedp/chromedp"
 	"github.com/tarekseba/flight-scraper/internal/scraper/types"
+	"github.com/tarekseba/flight-scraper/internal/scraper/utils"
 )
 
 type FillAndConfirmTripInfos struct {
@@ -44,36 +45,40 @@ func NewFillAndConfirmTripInfos(request types.Request) *FillAndConfirmTripInfos 
 func fill_from_input(ctx context.Context, city string, selector string, optionSelector string) error {
 	err := chromedp.WaitVisible(selector, chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
+	}
+	if err != nil {
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Evaluate(generate_trigger_input_field_script(selector, city), nil).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Sleep(time.Second * 2).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
-	err = chromedp.WaitVisible(make_option_selector(optionSelector), chromedp.ByQuery).Do(ctx)
+	sel := make_option_selector(optionSelector)
+	err = chromedp.WaitVisible(sel, chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
-	chromedp.Click(make_option_selector(optionSelector), chromedp.ByQuery)
+	chromedp.Click(sel, chromedp.ByQuery)
 	return nil
 }
 
 func fill_to_input(ctx context.Context, city string, selector string, optionSelector string) error {
 	err := chromedp.Evaluate(generate_trigger_input_field_script(types.SELECTOR_WHERE_TO_INPUT, types.SELECTOR_A_CITY), nil).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.WaitVisible(make_option_selector(types.SELECTOR_A_CITY_LABEL), chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Click(make_option_selector(types.SELECTOR_A_CITY_LABEL), chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	return nil
 }
@@ -83,47 +88,47 @@ func fill_date_inputs_and_search(ctx context.Context, departure time.Time, retur
 	var returnDate = format_date(returnD)
 	err := chromedp.Click(types.SELECTOR_D_DATE_INPUT, chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Sleep(time.Second * 2).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.WaitVisible(generate_calendar_date_selector(departureDate), chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Click(generate_calendar_date_selector(departureDate), chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Sleep(time.Second * 2).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Click(generate_calendar_date_selector(returnDate), chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Sleep(time.Second * 3).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Evaluate(types.SELECTOR_SEARCH_BUTTON_SCRIPT, nil).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Sleep(time.Second * 2).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.Evaluate(types.SELECTOR_SEARCH_BUTTON_SCRIPT, nil).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	err = chromedp.WaitVisible("body", chromedp.ByQuery).Do(ctx)
 	if err != nil {
-		return err
+		return utils.AnnotateError(err)
 	}
 	// chromedp.OuterHTML("body", &res6, chromedp.ByQuery).Do(c
 	return nil
