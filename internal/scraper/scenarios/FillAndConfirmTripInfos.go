@@ -15,7 +15,7 @@ type FillAndConfirmTripInfos struct {
 }
 
 func (s *FillAndConfirmTripInfos) Name() string {
-	return "FillAndConfirmTripInfos"
+	return fmt.Sprintf("FillAndConfirmTripInfos %+v", s)
 }
 
 func (s *FillAndConfirmTripInfos) Do(ctx context.Context) error {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/dom"
@@ -14,16 +13,15 @@ import (
 )
 
 type ParseFlightCombos struct {
-	UlNodeID cdp.NodeID
-	DepDate  time.Time
-	RetDate  time.Time
+	UlNodeID   cdp.NodeID
+	Request    types.Request
+	RequestRes types.RequestResult
 }
 
-func NewParseFlightCombos(ulNodeID cdp.NodeID, depDate, retDate time.Time) ParseFlightCombos {
+func NewParseFlightCombos(ulNodeID cdp.NodeID, request types.Request) ParseFlightCombos {
 	return ParseFlightCombos{
 		UlNodeID: ulNodeID,
-		DepDate:  depDate,
-		RetDate:  retDate,
+		Request:  request,
 	}
 }
 
@@ -44,7 +42,7 @@ func (s *ParseFlightCombos) Do(ctx context.Context) error {
 			return nil
 		}
 		var flight = types.Flight{
-			DepDate: s.DepDate,
+			DepDate: s.Request.DepartureDate,
 		}
 		var parseFlight = ParseFlight{NodeID: ulChildren[i], Flight: &flight, WithPrice: true}
 		err = LogScenario(&parseFlight)(ctx)
@@ -55,7 +53,7 @@ func (s *ParseFlightCombos) Do(ctx context.Context) error {
 		arr := insert_key_into_map(inbound_outbound_flights_map, flight)
 		var parseReturnFlights = ParseReturnFlights{
 			LiNodeID:   ulChildren[i],
-			returnDate: s.RetDate,
+			returnDate: s.Request.ReturnDate,
 			flights:    arr,
 		}
 		err := LogScenario(&parseReturnFlights)(ctx)
@@ -73,6 +71,8 @@ func (s *ParseFlightCombos) Do(ctx context.Context) error {
 		}
 	}
 	id_dep, id_dep_ret := make_flight_maps(inbound_outbound_flights_map)
+	s.RequestRes = types.NewRequestResult(s.Request, id_dep, id_dep_ret)
+
 	bytes, err := json.Marshal(id_dep)
 	if err != nil {
 		fmt.Println("Error during marshalling")
@@ -86,6 +86,7 @@ func (s *ParseFlightCombos) Do(ctx context.Context) error {
 		fmt.Println(err)
 	}
 	fmt.Println(string(bytes))
+
 	return nil
 }
 
@@ -94,7 +95,7 @@ func insert_key_into_map(m map[types.Flight][]types.Flight, key types.Flight) []
 	if elt != nil {
 		return elt
 	}
-	arr := make([]types.Flight, 5)
+	arr := make([]types.Flight, 0, 5)
 	m[key] = arr
 	return arr
 }

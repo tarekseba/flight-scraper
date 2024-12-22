@@ -12,6 +12,7 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/dom"
 	"github.com/chromedp/cdproto/runtime"
+	"github.com/tarekseba/flight-scraper/internal/logger"
 	"github.com/tarekseba/flight-scraper/internal/scraper/types"
 	"github.com/tarekseba/flight-scraper/internal/scraper/utils"
 )
@@ -179,7 +180,9 @@ func getAirports(ctx context.Context, nodeID cdp.NodeID) (string, string, error)
 		node := elements[index]
 		obj, err := dom.ResolveNode().WithNodeID(node).Do(ctx)
 		if err != nil {
-			return "", "", utils.AnnotateError(err)
+			logger.WarnLogger.Println("Airport span not found")
+			// return "", "", utils.AnnotateError(err)
+			break
 		}
 		val, _, err := runtime.CallFunctionOn(types.INNER_TEXT_FUNC).WithObjectID(obj.ObjectID).Do(ctx)
 		temp := string(val.Value)

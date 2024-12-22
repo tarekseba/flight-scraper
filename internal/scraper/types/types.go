@@ -124,7 +124,7 @@ func (q *Query) IntoRequests() []Request {
 	if len(q.Weekdays) <= 0 {
 		return requests
 	}
-	currentDate := time.Now().Add(DAY)
+	currentDate := time.Now()
 	currentWeekday := Weekday(currentDate.Weekday())
 	daysArray := make([]Weekday, len(q.Weekdays))
 	i := 0
@@ -251,4 +251,18 @@ func (f *Flight) ID() string {
 	}
 	airports := strings.ReplaceAll(f.Airports, " ", "")
 	return fmt.Sprintf("%s.%s.%s", date, time, airports)
+}
+
+type RequestResult struct {
+	Req    Request             `json:"req"`
+	DepIds map[string]Flight   `json:"dep_ids"`
+	DepRet map[string][]Flight `json:"dep_ret"`
+}
+
+func NewRequestResult(req Request, dep_ids map[string]Flight, dep_ret map[string][]Flight) RequestResult {
+	return RequestResult{
+		Req:    req,
+		DepIds: dep_ids,
+		DepRet: dep_ret,
+	}
 }
