@@ -12,11 +12,21 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
+	tDB "github.com/tarekseba/flight-scraper/internal/api/db"
 	"github.com/tarekseba/flight-scraper/internal/api/front"
 	"github.com/tarekseba/flight-scraper/internal/logger"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		logger.ErrorLogger.Fatal(err)
+	}
+
+	db := tDB.InitDB()
+	defer db.Close()
+
 	var mux *http.ServeMux = http.NewServeMux()
 	mux.HandleFunc("/api/", func(response http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(response, "Hello world")
