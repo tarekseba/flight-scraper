@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -32,21 +33,20 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGINT)
 
 	go func() {
-		sig := <-sigChan
-
-		logger.InfoLogger.Println(fmt.Sprintf("Signal received '%+v'", strings.ToUpper(sig.String())))
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-		defer cancel()
-		server.Shutdown(ctx)
-		// add services here later
-		front.StopServices(ctx)
-		logger.InfoLogger.Println("Server gracefully shutdown")
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			logger.ErrorLogger.Println(fmt.Sprintf("Server closed with error : %+v", err))
+		}
 	}()
 
-	err := server.ListenAndServe()
-
+	sig := <-sigChan
+	logger.InfoLogger.Println(fmt.Sprintf("Signal received [%+v]", strings.ToUpper(sig.String())))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+	err = server.Shutdown(ctx)
 	if err != nil {
 		logger.ErrorLogger.Println(err)
 		os.Exit(1)
 	}
+
+	logger.InfoLogger.Println("Server gracefully shutdown")
 }
