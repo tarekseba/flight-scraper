@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -110,11 +112,33 @@ type Request struct {
 }
 
 type Query struct {
-	Weekdays     HashSet[Weekday]
-	StayDuration int
-	MonthHorizon int
-	Departure    string
-	Destination  string
+	Weekdays     HashSet[Weekday] `json:"weekdays"`
+	StayDuration int              `json:"stay_duration"`
+	MonthHorizon int              `json:"month_horizon"`
+	Departure    string           `json:"departure"`
+	Destination  string           `json:"destination"`
+}
+
+func (q *Query) SanitizeQuery() error {
+	weekdays := HashSet[Weekday]{}
+	for k, _ := range q.Weekdays {
+		intVal := int(k)
+		if intVal >= 0 && intVal <= 6 {
+			weekdays[k] = true
+		}
+	}
+	if len(weekdays) == 0 {
+		return fmt.Errorf("Weekdays empty after sanitization")
+	}
+	q.StayDuration = int(math.Max(float64(q.StayDuration), 1))
+	q.MonthHorizon = int(math.Min(float64(q.MonthHorizon), 2))
+	if q.Departure == "" {
+		return fmt.Errorf("Departure field is empty")
+	}
+	if q.Destination == "" {
+		return fmt.Errorf("Destination field is empty")
+	}
+	return nil
 }
 
 func (q *Query) IntoRequests() []Request {
@@ -152,6 +176,17 @@ func (q *Query) IntoRequests() []Request {
 		}
 	}
 	return requests
+}
+
+func (q *Query) StringifyWeekdays() string {
+	weekdays := ""
+	for k, _ := range q.Weekdays {
+		if k > 6 || k < 0 {
+			continue
+		}
+		weekdays = weekdays + strconv.Itoa(int(k))
+	}
+	return weekdays
 }
 
 func PlusMonths(month time.Month, m int) time.Month {
